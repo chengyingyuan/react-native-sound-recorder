@@ -127,8 +127,10 @@ RCT_EXPORT_METHOD(start:(NSString *)path
         return;
     }
     
+    [_recorder setMeteringEnabled:YES];
     [_recorder prepareToRecord];
     [_recorder record];
+    [_recorder updateMeters];
     [session setActive:YES error:&err];
     
     if (err) {
@@ -142,6 +144,18 @@ RCT_EXPORT_METHOD(start:(NSString *)path
         reject(@"recording_failed", [@"Cannot record audio at path: " stringByAppendingString:[_recorder url].absoluteString], nil);
     }
     
+}
+
+RCT_EXPORT_METHOD(getMaxAmplitude:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+    if(!_recorder) {
+        reject(@"not_recording", @"Not Recording", nil);
+        return;
+    }
+
+    [_recorder updateMeters];
+    double avgPowerForChannel = [_recorder averagePowerForChannel:0]; // -160 ~ 0
+    resolve([NSNumber numberWithDouble:avgPowerForChannel]);
 }
 
 RCT_EXPORT_METHOD(stop:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)

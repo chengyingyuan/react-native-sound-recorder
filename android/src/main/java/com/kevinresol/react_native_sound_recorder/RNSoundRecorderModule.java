@@ -72,6 +72,16 @@ public class RNSoundRecorderModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
+  public void getMaxAmplitude(final Promise promise) {
+    if (mRecorder == null) {
+        promise.resolve(0);
+        return;
+    }
+    int value = mRecorder.getMaxAmplitude();
+    promise.resolve(value);
+  }
+
+  @ReactMethod
   public void start(String path, ReadableMap options, Promise promise) {
     if(mRecorder != null) {
       promise.reject("already_recording", "Already Recording");
